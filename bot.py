@@ -6,6 +6,7 @@ from uuid import uuid4
 import os
 bot_token='8304724754:AAFW9hbOFNGCPI0vqQiN3OvTqz2IIwYQsVI'
 bot_token=os.environ.get('bot_token')
+print("BOT_TOKEN існує:", bool(os.environ.get("BOT_TOKEN")))
 
 if not bot_token:
     raise RuntimeError('bot_token не знайдено у змінних середовища')
