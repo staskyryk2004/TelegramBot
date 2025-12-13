@@ -4,7 +4,8 @@ from  telebot  import types
 from io import BytesIO
 from uuid import uuid4
 import os
-bot_token=os.environ.get('token')
+bot_token='8304724754:AAFW9hbOFNGCPI0vqQiN3OvTqz2IIwYQsVI'
+bot_token=os.environ.get('bot_token')
 
 if not bot_token:
     raise RuntimeError('bot_token не знайдено у змінних середовища')
