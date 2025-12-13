@@ -12,6 +12,7 @@ if not bot_token:
 client=telebot.TeleBot(config.config['token'])
 
 table_file='zm.pdf'
+
 @client.message_handler(content_types=['document'])
 def handle_docs_audio(message):
     content_type = message.content_type
