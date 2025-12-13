@@ -4,7 +4,7 @@ from  telebot  import types
 from io import BytesIO
 from uuid import uuid4
 import os
-bot_token=os.environ.get('8304724754:AAFW9hbOFNGCPI0vqQiN3OvTqz2IIwYQsVI')
+bot_token=os.environ.get('token')
 client=telebot.TeleBot(config.config['token'])
 
 table_file='zm.pdf'
