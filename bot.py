@@ -5,6 +5,10 @@ from io import BytesIO
 from uuid import uuid4
 import os
 bot_token=os.environ.get('token')
+
+if not bot_token:
+    raise RuntimeError('bot_token не знайдено у змінних середовища')
+
 client=telebot.TeleBot(config.config['token'])
 
 table_file='zm.pdf'
