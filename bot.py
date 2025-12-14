@@ -1,12 +1,36 @@
 import telebot
 import config
-from  telebot  import types
+import requests
+from  telebot  import types 
 from io import BytesIO
 from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
-
 table_file='zm.pdf'
+table_url='https://bati.nubip.edu.ua/images/EDU_ROZ_INS/Zm_Roz_in.pdf'
+@client.message_handler(commands=['start'])
+def start(message):
+    markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add('Актуальний розклад')
+    client.send_message(message.chat.id, "Показати актуальний розклад",
+        reply_markup=markup)
+    
+@client.message_handler(func=lambda m: m.text == 'Актуальний розклад')
+def send_table(message):
+    client.send_message(message.chat.id,'Зачекайте завантажується актуальний розклад...')
+    try:
+        response=requests.get(table_url,timeout=20)
+        response.raise_for_status()
 
+        file_bytes=BytesIO(response.content)
+        file_bytes.name="Zm_Roz_in.pdf"
+
+        client.send_document(message.chat.id, 
+                file_bytes,
+                caption='Актуальний розклад завантажено')
+
+    except requests.exceptions.RequestException as e:
+        client.send_message(message.chat.id, 
+                f'Помилка завантаження розкладу:\n {e}')
 @client.message_handler(content_types=['document'])
 def handle_docs_audio(message):
     content_type = message.content_type
