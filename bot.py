@@ -10,10 +10,23 @@ table_url='https://bati.nubip.edu.ua/images/EDU_ROZ_INS/Zm_Roz_in.pdf'
 @client.message_handler(commands=['start'])
 def start(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add('Актуальний розклад')
-    client.send_message(message.chat.id, "Показати актуальний розклад",
+    markup.add('Актуальний розклад','Команди сервера')
+    client.send_message(message.chat.id, "Вітаю! Оберіть дію:",
         reply_markup=markup)
-    
+@client.message_handler(func=lambda m: m.text == 'Команди сервера')
+def server_commands(message):
+    text =('*Доступні команди бота:*\n\n'
+        "▶ `/start` — запуск бота і показує меню команд які є на сервері\n"
+        "▶ `/info` — команда яка показує розклад який є на сервері\n"
+        "▶ *Розклад* — показує розклад і завантажує на сервер\n"
+        "▶ *Актуальний розклад* — завантажити PDF з сайту інституту\n"
+        "▶ *📖 Команди сервера* — показує список команд\n\n"
+        "ℹ️ Бот працює на сервері\n"
+        'ℹ️ Дані завантажуються безпосередньо з офіційного сайту')
+    client.send_message(message.chat.id, text, parse_mode='Markdown')
+@client.message_handler(commands=['help'])
+def help_cmd(message):
+   server_commands(message) 
 @client.message_handler(func=lambda m: m.text == 'Актуальний розклад')
 def send_table(message):
     client.send_message(message.chat.id,'Зачекайте завантажується актуальний розклад...')
