@@ -9,36 +9,6 @@ from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
 table_file='zm.pdf'
 table_url='https://bati.nubip.edu.ua/images/EDU_ROZ_INS/Zm_Roz_in.pdf'
-
-def extract_info_from_pdf(path):
-    text=''
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            text+=page.extract_text() + '\n'
-
-        date_match=re.search(r'\d{1,2}\s+\w+\s+202\d', text)
-        date=date_match.group(0) if date_match else 'Невідомо'
-        
-        day_match=re.search(r"на\s+(\w+)\s+\((чисельник|знаменник)\)", text)
-        if day_match:
-            day=day_match.group(1)
-            week_type=day_match.group(2)
-        else:
-            day='Невідомо'
-            week_type='Невідомо'
-        return date, day, week_type
-    
-@client.message_handler(commands=['rozklad'])
-def send_rozklad_info(message):
-    date, day, week_type=extract_info_from_pdf(table_file)
-    text=(f'Розклад занять\n',
-          f'Дата: {date}\n',
-          f'День: {day}\n',
-          f'Тип тижня: {week_type}\n\n',
-          f'Файл з новим розкладом нижче')
-    with open(table_file, 'rb') as f:
-     client.send_message(message.chat.id, text, parse_mode='Markdown')
-     client.send_message(message.chat.id, f)
 @client.message_handler(commands=['start'])
 def start(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -111,7 +81,8 @@ def answer(call):
         reply_markup = markup_reply
         )
     elif call.data == 'no': 
-       pass   
+       pass
+    
 @client.message_handler(func=lambda m: m.text == 'Розклад',)
 def send_table(message):
     with open(table_file, 'rb') as f:
