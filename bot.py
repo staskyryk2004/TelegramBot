@@ -39,9 +39,26 @@ def send_table(message):
         file_bytes=BytesIO(response.content)
         file_bytes.name="Zm_Roz_in.pdf"
 
+        text=''
+        with pdfplumber.open(file_bytes) as pdf:
+            for page in pdf.pages:
+                text+=page.extract_text() + '\n'
+
+            day=re.search(r'на\s+(понеділок|вівторок|середу|четвер|пʼятницю|суботу|неділю)', text, re.IGNORECASE)
+            day=day.group(1) if day else 'Невідомо'
+            date=re.search(r'\d{1,2}\s+(січня|лютого|березня|квітня|травня|червня|'
+            r'липня|серпня|вересня|жовтня|листопада|грудня)\s+202\d', text)
+            date=date.group(0) if date else 'Невідомо'
+            client.send_message(message.chat.id,
+                f'Актуальний розклад\n'
+                f'День: {day}\n'
+                f'Дата: {date}',
+                parse_mode='Markdown')
+            
+        file_bytes.seek(0)
         client.send_document(message.chat.id, 
-                file_bytes,
-                caption='Актуальний розклад завантажено')
+        file_bytes,
+        caption='Повний файл розкладу')
 
     except requests.exceptions.RequestException as e:
         client.send_message(message.chat.id, 
