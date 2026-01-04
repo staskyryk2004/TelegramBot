@@ -2,7 +2,7 @@ import pdfplumber
 import re
 import telebot
 import config
-import requests
+import requests 
 from  telebot  import types 
 from io import BytesIO
 from uuid import uuid4
