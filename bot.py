@@ -7,7 +7,7 @@ from  telebot  import types
 from io import BytesIO
 from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
-table_file='zm.pdf'
+table_file='/local/zm.pdf'
 table_url='https://bati.nubip.edu.ua/images/EDU_ROZ_INS/Zm_Roz_in.pdf'
 @client.message_handler(commands=['start'])
 def start(message):
