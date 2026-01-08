@@ -2,13 +2,23 @@ import pdfplumber
 import re
 import telebot
 import config
-import requests 
+import requests
+from flask import Flask
+from flask import send_from_directory
 from  telebot  import types 
 from io import BytesIO
 from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
+client=Flask(__name__)
 table_file='/local/zm.pdf'
-table_url='https://bati.nubip.edu.ua/images/EDU_ROZ_INS/Zm_Roz_in.pdf'
+table_url='http://127.0.0.1:5000/local'
+@client.route('/local')
+def get_rozklad():
+    return send_from_directory(
+        directory='local',
+        path='zm.pdf')
+if __name__=='__main__':
+ client.run(debug=True)
 @client.message_handler(commands=['start'])
 def start(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
