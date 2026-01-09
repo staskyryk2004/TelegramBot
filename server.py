@@ -1,6 +1,5 @@
 from flask import Flask, app, request
 from flask import send_from_directory
-from threading import Thread
 
 app=Flask(__name__)
 
