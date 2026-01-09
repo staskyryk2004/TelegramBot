@@ -1,3 +1,5 @@
+import hashlib
+import time
 import pdfplumber
 import re
 import telebot
@@ -9,7 +11,8 @@ from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
 table_file='/local/zm.pdf'
 table_url='http://127.0.0.1:5000'
-
+chat_id=6063647240
+last_hash=None
 @client.message_handler(commands=['start'])
 def start(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -20,10 +23,8 @@ def start(message):
 def server_commands(message):
     text =('*Доступні команди бота:*\n\n'
         "▶ `/start` — запуск бота і показує меню команд які є на сервері\n"
-        "▶ `/info` — команда яка показує розклад який є на сервері\n"
-        "▶ *Розклад* — показує розклад і завантажує на сервер\n"
         "▶ *Актуальний розклад* — завантажити PDF з сайту інституту\n"
-        "▶ *📖 Команди сервера* — показує список команд\n\n"
+        "▶ *Команди сервера* — показує список команд\n\n"
         "ℹ️ Бот працює на сервері\n"
         'ℹ️ Дані завантажуються безпосередньо з офіційного сайту')
     client.send_message(message.chat.id, text, parse_mode='Markdown')
@@ -43,7 +44,6 @@ def send_table(message):
         with pdfplumber.open(file_bytes) as pdf:
             for page in pdf.pages:
                 text+=page.extract_text() + '\n'
-
             day=re.search(r'на\s+(понеділок|вівторок|середу|четвер|пʼятницю|суботу|неділю)', text, re.IGNORECASE)
             day=day.group(1) if day else 'Невідомо'
             date=re.search(r'\d{1,2}\s+(січня|лютого|березня|квітня|травня|червня|'
@@ -59,6 +59,13 @@ def send_table(message):
     except requests.exceptions.RequestException as e:
         client.send_message(message.chat.id, 
                 f'Помилка завантаження розкладу:\n {e}')
+    while True:
+      response=requests.get(table_url)
+      current_hash= hashlib.md5(response.content).hexdigest()
+      if last_hash and current_hash != last_hash:
+       client.send_message(chat_id, f'Дані оновлено') 
+       client.send_message(chat_id, response.content) 
+          
 @client.message_handler(content_types=['document'])
 def handle_docs_audio(message):
     content_type = message.content_type
@@ -75,26 +82,6 @@ def handle_docs_audio(message):
         data=file_bytes,
         caption=f"Файл отримано та виведено ботом\n {file_name}"
     )
-@client.message_handler(commands=['get_info','info'])
-def get_user_info(message):
-    markup_inline = types.InlineKeyboardMarkup()
-    item_yes = types.InlineKeyboardButton(text='Так', callback_data='yes')
-    item_no = types.InlineKeyboardButton(text='Ні', callback_data='no')
-    markup_inline.add(item_yes,item_no)
-    client.send_message(message.chat.id, 'Бажаєте дізнатися розклад',
-        reply_markup=markup_inline)
-    
-@client.callback_query_handler(func=lambda call:True)
-def answer(call):
-    if call.data =='yes':
-      markup_reply= types.ReplyKeyboardMarkup(resize_keyboard=True)
-      item_tables=types.KeyboardButton('Розклад')
-      markup_reply.add(item_tables)
-      client.send_message(call.message.chat.id, 'Показати розклад:',
-        reply_markup = markup_reply
-        )
-    elif call.data == 'no': 
-       pass
 
 @client.message_handler(commands=['id'])
 def get_chat_id(message):
