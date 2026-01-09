@@ -95,7 +95,10 @@ def answer(call):
         )
     elif call.data == 'no': 
        pass
-    
+
+@client.message_handler(commands=['id'])
+def get_chat_id(message):
+ client.send_message(message.chat.id, f'Показати id:{message.chat.id}',)
 @client.message_handler(func=lambda m: m.text == 'Розклад',)
 def send_table(message):
     with open(table_file, 'rb') as f:
