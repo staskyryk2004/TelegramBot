@@ -3,22 +3,13 @@ import re
 import telebot
 import config
 import requests
-from flask import Flask
-from flask import send_from_directory
 from  telebot  import types 
 from io import BytesIO
 from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
-client=Flask(__name__)
 table_file='/local/zm.pdf'
-table_url='http://127.0.0.1:5000/local'
-@client.route('/local')
-def get_rozklad():
-    return send_from_directory(
-        directory='local',
-        path='zm.pdf')
-if __name__=='__main__':
- client.run(debug=True)
+table_url='http://127.0.0.1:5000'
+
 @client.message_handler(commands=['start'])
 def start(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -43,11 +34,10 @@ def help_cmd(message):
 def send_table(message):
     client.send_message(message.chat.id,'Зачекайте завантажується актуальний розклад...')
     try:
-        response=requests.get(table_url,timeout=20)
-        response.raise_for_status()
-
+        response=requests.get(f'{table_url}/local')
         file_bytes=BytesIO(response.content)
-        file_bytes.name="Zm_Roz_in.pdf"
+        file_bytes.name="zm.pdf"
+        client.send_document(message.chat.id, file_bytes)
 
         text=''
         with pdfplumber.open(file_bytes) as pdf:
@@ -66,10 +56,6 @@ def send_table(message):
                 parse_mode='Markdown')
             
         file_bytes.seek(0)
-        client.send_document(message.chat.id, 
-        file_bytes,
-        caption='Повний файл розкладу')
-
     except requests.exceptions.RequestException as e:
         client.send_message(message.chat.id, 
                 f'Помилка завантаження розкладу:\n {e}')
