@@ -30,6 +30,7 @@ def server_commands(message):
         "▶ *Команди сервера* — показує список команд\n\n"
         "ℹ️ Бот працює на сервері\n"
         'ℹ️ Дані завантажуються безпосередньо з офіційного сайту')
+    client.send_message(message.chat.id, text, parse_mode="Markdown")
 @client.message_handler(commands=['help'])
 def help_cmd(message):
    server_commands(message) 
