@@ -1,4 +1,6 @@
+from email import message
 import hashlib
+from pydoc import text
 import time
 import pdfplumber
 import re
@@ -13,6 +15,7 @@ table_file='/local/zm.pdf'
 table_url='http://127.0.0.1:5000'
 chat_id=6063647240
 last_hash=None
+
 @client.message_handler(commands=['start'])
 def start(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -27,7 +30,6 @@ def server_commands(message):
         "▶ *Команди сервера* — показує список команд\n\n"
         "ℹ️ Бот працює на сервері\n"
         'ℹ️ Дані завантажуються безпосередньо з офіційного сайту')
-    client.send_message(message.chat.id, text, parse_mode='Markdown')
 @client.message_handler(commands=['help'])
 def help_cmd(message):
    server_commands(message) 
