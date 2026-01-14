@@ -12,7 +12,7 @@ from io import BytesIO
 from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
 table_file='/local/zm.pdf'
-table_url='http://127.0.0.1:5000'
+table_url='https://rozklad.cx.ua/local'
 chat_id=6063647240
 last_hash=None
 
