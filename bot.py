@@ -28,15 +28,13 @@ def server_commands(message):
         "▶ `/start` — запуск бота і показує меню команд які є на сервері\n"
         "▶ *Актуальний розклад* — завантажити PDF з сайту інституту\n"
         "▶ *Команди сервера* — показує список команд\n\n"
-        "ℹ️ Бот працює на сервері\n"
-        'ℹ️ Дані завантажуються безпосередньо з офіційного сайту')
+        "ℹ️ Дані завантажуються безпосередньо з офіційного сайту")
     client.send_message(message.chat.id, text, parse_mode="Markdown")
 @client.message_handler(commands=['help'])
 def help_cmd(message):
    server_commands(message) 
 @client.message_handler(func=lambda m: m.text == 'Актуальний розклад')
 def send_table(message):
-    client.send_message(message.chat.id,'Зачекайте завантажується актуальний розклад...')
     try:
         response=requests.get(f'{table_url}/local')
         file_bytes=BytesIO(response.content)
