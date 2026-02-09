@@ -1,7 +1,9 @@
+from flask import Flask, app, request
 from email import message
 import hashlib
 from pydoc import text
 import time
+import io
 import pdfplumber
 import re
 import telebot
@@ -11,11 +13,10 @@ from  telebot  import types
 from io import BytesIO
 from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
-table_file='/local/zm.pdf'
-table_url='https://rozklad.cx.ua/local'
+table_url='http://127.0.0.1:5000/local'
+table_file='zm.pdf'
 chat_id=6063647240
 last_hash=None
-
 @client.message_handler(commands=['start'])
 def start(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -28,13 +29,15 @@ def server_commands(message):
         "▶ `/start` — запуск бота і показує меню команд які є на сервері\n"
         "▶ *Актуальний розклад* — завантажити PDF з сайту інституту\n"
         "▶ *Команди сервера* — показує список команд\n\n"
-        "ℹ️ Дані завантажуються безпосередньо з офіційного сайту")
+        "ℹ️ Бот працює на сервері\n"
+        'ℹ️ Дані завантажуються безпосередньо з офіційного сайту')
     client.send_message(message.chat.id, text, parse_mode="Markdown")
 @client.message_handler(commands=['help'])
 def help_cmd(message):
    server_commands(message) 
 @client.message_handler(func=lambda m: m.text == 'Актуальний розклад')
 def send_table(message):
+    client.send_message(message.chat.id,'Зачекайте завантажується актуальний розклад...')
     try:
         response=requests.get(f'{table_url}/local')
         file_bytes=BytesIO(response.content)
@@ -42,9 +45,11 @@ def send_table(message):
         client.send_document(message.chat.id, file_bytes)
 
         text=''
-        with pdfplumber.open(file_bytes) as pdf:
-            for page in pdf.pages:
-                text+=page.extract_text() + '\n'
+        with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+         for page in pdf.pages:
+            extracted = page.extract_text()
+            if extracted:
+                text += extracted + '\n'
             day=re.search(r'на\s+(понеділок|вівторок|середу|четвер|пʼятницю|суботу|неділю)', text, re.IGNORECASE)
             day=day.group(1) if day else 'Невідомо'
             date=re.search(r'\d{1,2}\s+(січня|лютого|березня|квітня|травня|червня|'
