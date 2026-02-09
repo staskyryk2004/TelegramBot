@@ -4,6 +4,7 @@ import hashlib
 from pydoc import text
 import time
 import io
+import os
 import pdfplumber
 import re
 import telebot
@@ -15,6 +16,7 @@ from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
 table_url='http://127.0.0.1:5000/local'
 table_file='zm.pdf'
+save_dir='local'
 chat_id=6063647240
 last_hash=None
 @client.message_handler(commands=['start'])
@@ -39,13 +41,27 @@ def help_cmd(message):
 def send_table(message):
     client.send_message(message.chat.id,'Зачекайте завантажується актуальний розклад...')
     try:
-        response=requests.get(f'{table_url}/local')
-        file_bytes=BytesIO(response.content)
-        file_bytes.name="zm.pdf"
-        client.send_document(message.chat.id, file_bytes)
 
+        if not os.path.exists(save_dir):
+         os.makedirs(save_dir)
+
+        response=requests.get(f'{table_url}/local')
+        if response.status_code != 200:
+           client.send_message(message.chat.id, "Розклад не завантажується")
+           return
+        
+        file_path=os.path.join(save_dir, table_file='zm.pdf')
+
+        with open(file_path, "wb") as pdf:
+         os.f.write(response.content)
+
+         print(f"Файл збережено: {file_path}")
+           
+        with open(file_path, "rb") as doc:
+            client.send_document(message.chat.id, doc)
+            
         text=''
-        with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+        with pdfplumber.open(io.BytesIO(table_file)) as pdf:
          for page in pdf.pages:
             extracted = page.extract_text()
             if extracted:
@@ -60,8 +76,11 @@ def send_table(message):
                 f'День: {day}\n'
                 f'Дата: {date}',
                 parse_mode='Markdown')
-            
-        file_bytes.seek(0)
+        client.send_message(message.chat.id, f" Файл оновлено та збережено!\n День: {day}")
+
+        with open(file_path, "rb") as doc:
+         client.send_document(message.chat.id, doc)
+
     except requests.exceptions.RequestException as e:
         client.send_message(message.chat.id, 
                 f'Помилка завантаження розкладу:\n {e}')
