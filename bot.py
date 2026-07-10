@@ -47,7 +47,7 @@ def send_table(message):
         client.send_document(message.chat.id, file_bytes)
 
         text=''
-        with pdfplumber.open(io.BytesIO(table_file)) as pdf:
+        with pdfplumber.open(table_file) as pdf:
          for page in pdf.pages:
             extracted = page.extract_text()
             if extracted:
