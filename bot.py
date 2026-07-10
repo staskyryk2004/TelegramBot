@@ -105,5 +105,4 @@ def get_text(message):
 def get_content(message):
     if message.text == 'Розклад':
         client.send_message(message.chat.id, f'Показати розклад: {message.from_item_tables}')
-client.remove_webhook()
 client.polling(none_stop = True, interval = 0)
