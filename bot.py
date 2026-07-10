@@ -15,7 +15,7 @@ from io import BytesIO
 from uuid import uuid4
 client=telebot.TeleBot(config.config['token'])
 table_url='http://127.0.0.1:5000'
-table_file='zm.pdf'
+table_file="/home/ubuntu/TelegramBot/zm.pdf"
 chat_id=6063647240
 last_hash=None
 @client.message_handler(commands=['start'])
