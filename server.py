@@ -1,22 +1,21 @@
 from flask import Flask, app, request
 from flask import send_from_directory
 from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from flask_limiter.util import get_x_forwarded_for
 import telebot
 import config
 client=telebot.TeleBot(config.config['token'])
 app=Flask(__name__)
 limiter=Limiter(
-    get_remote_address,
+    key_func=get_x_forwarded_for,
     app=app,
-    default_limits=["5 per minute; 30 per hour"],
     storage_uri="memory://")
 
 @app.route('/')
 def home():
     return "Сервер працює стабільно!", 200
 @app.route('/local')
-@limiter.limit("2 per minute")
+@limiter.limit("5 per minute; 30 per hour")
 def get_rozklad():
     return send_from_directory(
         directory='local',
