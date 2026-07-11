@@ -11,6 +11,9 @@ limiter=Limiter(
     app=app,
     default_limits=["5 per day", "1 per hour"],
     storage_uri="memory://")
+@app.route('/')
+def home():
+    return "Сервер працює стабільно!", 200
 @app.route('/local')
 @limiter.limit("2 per minute")
 def get_rozklad():
