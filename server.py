@@ -9,7 +9,7 @@ app=Flask(__name__)
 limiter=Limiter(
     get_remote_address,
     app=app,
-    default_limits=["5 per hour", "20 per day"],
+    default_limits=["5 per minute; 20 per hour"],
     storage_uri="memory://")
 
 @app.route('/')
