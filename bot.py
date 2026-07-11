@@ -69,6 +69,7 @@ def send_table(message):
     while True:
       response=requests.get(table_url)
       current_hash= hashlib.md5(response.content).hexdigest()
+      time.sleep(0.1)
       if last_hash and current_hash != last_hash:
        client.send_message(chat_id, f'Дані оновлено') 
        client.send_message(chat_id, response.content) 
