@@ -15,7 +15,7 @@ limiter=Limiter(
 def home():
     return "Сервер працює стабільно!", 200
 @app.route('/local')
-@limiter.limit("10 per minute; 20 per hour")
+@limiter.limit("5 per minute; 20 per hour")
 def get_rozklad():
     return send_from_directory(
         directory='local',
