@@ -9,14 +9,14 @@ app=Flask(__name__)
 limiter=Limiter(
     get_remote_address,
     app=app,
-    default_limits=["5 per hour", "1 per day"],
+    default_limits=["10 per hour", "1 per day"],
     storage_uri="memory://")
 
 @app.route('/')
 def home():
     return "Сервер працює стабільно!", 200
 @app.route('/local')
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def get_rozklad():
     return send_from_directory(
         directory='local',
